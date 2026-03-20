@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeChat Sticker Pack — 群聊表情包</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>群聊表情包</h1>
+  <p class="subtitle">3-8人 + 很多人 · 庆祝 · 点赞 · 比心 — 21个动态表情</p>
+
+  <div class="export-bar" id="exportBar">
+    <button class="btn-primary" id="btnDownloadAll">下载全部 GIF (ZIP)</button>
+    <span class="progress-text" id="progressText"></span>
+  </div>
+
+  <div id="app"></div>
+
+  <script type="module">
+    import { createSticker, getCountLabel } from './js/figures.js';
+    import { injectAnimations } from './js/animations.js';
+    import { exportStickerToGif, downloadBlob, exportAllAsZip } from './js/gif-export.js';
+
+    const emotions = [
+      { id: 'celebrate', name: '庆祝撒花', nameEn: 'Celebrate', badge: 'badge-celebrate' },
+      { id: 'thumbsup',  name: '点赞加油', nameEn: 'Thumbs Up', badge: 'badge-thumbsup' },
+      { id: 'love',      name: '比心',     nameEn: 'Love',      badge: 'badge-love' },
+    ];
+    const counts = [3, 4, 5, 6, 7, 8, 9]; // 9 = crowd/很多人
+
+    injectAnimations();
+
+    const app = document.getElementById('app');
+    const allStickers = [];
+
+    for (const emo of emotions) {
+      const section = document.createElement('div');
+      section.className = 'emotion-section';
+
+      const header = document.createElement('div');
+      header.className = 'emotion-header';
+      header.innerHTML = `
+        <h2>${emo.name}</h2>
+        <span class="badge ${emo.badge}">${emo.nameEn}</span>
+      `;
+      section.appendChild(header);
+
+      const grid = document.createElement('div');
+      grid.className = 'sticker-grid';
+
+      for (const count of counts) {
+        const card = document.createElement('div');
+        card.className = 'sticker-card';
+
+        const svg = createSticker(emo.id, count);
+        card.appendChild(svg);
+
+        const labelRow = document.createElement('div');
+        labelRow.className = 'sticker-footer';
+
+        const label = document.createElement('span');
+        label.className = 'sticker-label';
+        label.textContent = getCountLabel(count);
+        labelRow.appendChild(label);
+
+        const dlBtn = document.createElement('button');
+        dlBtn.className = 'btn-dl';
+        dlBtn.textContent = 'GIF';
+        dlBtn.title = '导出为 GIF';
+        labelRow.appendChild(dlBtn);
+
+        card.appendChild(labelRow);
+        grid.appendChild(card);
+
+        allStickers.push({ emotion: emo.id, count, svg, dlBtn });
+
+        dlBtn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          dlBtn.disabled = true;
+          dlBtn.textContent = '...';
+          try {
+            const blob = await exportStickerToGif(svg, emo.id);
+            const cntLabel = count > 8 ? 'crowd' : `${count}p`;
+            downloadBlob(blob, `${emo.id}_${cntLabel}.gif`);
+          } catch (err) {
+            console.error('Export failed:', err);
+            alert('导出失败，请查看控制台。');
+          } finally {
+            dlBtn.disabled = false;
+            dlBtn.textContent = 'GIF';
+          }
+        });
+      }
+
+      section.appendChild(grid);
+      app.appendChild(section);
+    }
+
+    // Batch download
+    const btnAll = document.getElementById('btnDownloadAll');
+    const progressText = document.getElementById('progressText');
+
+    btnAll.addEventListener('click', async () => {
+      btnAll.disabled = true;
+      progressText.textContent = '准备中...';
+
+      try {
+        const zipBlob = await exportAllAsZip(allStickers, (done, total, name) => {
+          if (done < total) {
+            progressText.textContent = `导出中 ${done + 1}/${total}: ${name}`;
+          } else {
+            progressText.textContent = '打包中...';
+          }
+        });
+        downloadBlob(zipBlob, 'wechat-stickers.zip');
+        progressText.textContent = '完成!';
+        setTimeout(() => { progressText.textContent = ''; }, 3000);
+      } catch (err) {
+        console.error('Batch export failed:', err);
+        progressText.textContent = '导出失败';
+        alert('批量导出失败，请查看控制台。');
+      } finally {
+        btnAll.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

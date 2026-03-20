@@ -1,0 +1,171 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #f5f5f7;
+  color: #1d1d1f;
+  padding: 40px 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #86868b;
+  font-size: 15px;
+  margin-bottom: 40px;
+}
+
+.emotion-section {
+  max-width: 1100px;
+  margin: 0 auto 48px;
+}
+
+.emotion-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-left: 4px;
+}
+
+.emotion-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.emotion-header .badge {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.badge-celebrate { background: #FFF3E0; color: #E65100; }
+.badge-thumbsup { background: #E3F2FD; color: #1565C0; }
+.badge-love { background: #FCE4EC; color: #C62828; }
+
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.sticker-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.sticker-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.sticker-card svg {
+  width: 140px;
+  height: 140px;
+}
+
+.sticker-footer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.sticker-label {
+  font-size: 13px;
+  color: #86868b;
+  font-weight: 500;
+}
+
+.btn-dl {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid #d2d2d7;
+  background: #fff;
+  color: #86868b;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.btn-dl:hover {
+  border-color: #0071e3;
+  color: #0071e3;
+}
+
+.btn-dl:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.export-bar {
+  max-width: 1100px;
+  margin: 0 auto 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-text {
+  font-size: 13px;
+  color: #86868b;
+}
+
+.export-bar button {
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.export-bar button:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: #0071e3;
+  color: #fff;
+}
+.btn-primary:hover { background: #0077ED; }
+
+.btn-secondary {
+  background: #e8e8ed;
+  color: #1d1d1f;
+}
+.btn-secondary:hover { background: #d2d2d7; }
+
+@media (max-width: 768px) {
+  .sticker-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+  .sticker-card svg {
+    width: 110px;
+    height: 110px;
+  }
+  h1 { font-size: 22px; }
+}
