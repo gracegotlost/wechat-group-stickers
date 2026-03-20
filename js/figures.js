@@ -1,54 +1,72 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const SIZE = 240;
 
+// Portrait mahjong tile dimensions within the 240×240 square
+const TILE_W = 160;
+const TILE_H = 228;
+const TILE_X = (SIZE - TILE_W) / 2; // 40
+const TILE_Y = (SIZE - TILE_H) / 2; // 6
+
+// Content area inside the tile (after inner padding)
+const PAD = 12;
+const CX0 = TILE_X + PAD;           // 52
+const CY0 = TILE_Y + PAD;           // 18
+const CW = TILE_W - PAD * 2;        // 136
+const CH = TILE_H - PAD * 2;        // 204
+
+// Helper: convert normalized (0-1) coords to absolute within tile content area
+function pos(nx, ny) { return [CX0 + nx * CW, CY0 + ny * CH]; }
+
 function svgEl(tag, attrs = {}) {
   const el = document.createElementNS(SVG_NS, tag);
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   return el;
 }
 
-// Mahjong 条子 (bamboo tile) layouts
-// Each pattern mirrors the classic bamboo stick arrangements on mahjong tiles
+// Authentic mahjong 条子 (bamboo tile) layouts
+// Patterns match real Chinese mahjong tile stick arrangements
 const MAHJONG_LAYOUTS = {
-  // 三条: vertical column of 3
-  3: { scale: 0.85, positions: [
-    [120, 58], [120, 118], [120, 178],
+  // 三条: diagonal staircase (^/inverted-V pattern)
+  3: { scale: 0.78, positions: [
+    pos(0.50, 0.18),   // top center
+    pos(0.22, 0.65),   // bottom left
+    pos(0.78, 0.65),   // bottom right
   ]},
   // 四条: 2×2 grid
-  4: { scale: 0.78, positions: [
-    [82, 78], [158, 78],
-    [82, 162], [158, 162],
+  4: { scale: 0.70, positions: [
+    pos(0.30, 0.25), pos(0.70, 0.25),
+    pos(0.30, 0.72), pos(0.70, 0.72),
   ]},
-  // 五条: 2-1-2 cross pattern
-  5: { scale: 0.68, positions: [
-    [82, 52], [158, 52],
-    [120, 118],
-    [82, 184], [158, 184],
+  // 五条: 2×2 + 1 center (cross/diamond)
+  5: { scale: 0.60, positions: [
+    pos(0.28, 0.16), pos(0.72, 0.16),
+    pos(0.50, 0.50),
+    pos(0.28, 0.84), pos(0.72, 0.84),
   ]},
-  // 六条: 2×3 grid (2 columns, 3 rows)
-  6: { scale: 0.62, positions: [
-    [84, 48], [156, 48],
-    [84, 118], [156, 118],
-    [84, 188], [156, 188],
+  // 六条: 2 columns × 3 rows
+  6: { scale: 0.55, positions: [
+    pos(0.30, 0.14), pos(0.70, 0.14),
+    pos(0.30, 0.50), pos(0.70, 0.50),
+    pos(0.30, 0.86), pos(0.70, 0.86),
   ]},
-  // 七条: 2-3-2 pattern
-  7: { scale: 0.56, positions: [
-    [84, 44], [156, 44],
-    [56, 118], [120, 118], [184, 118],
-    [84, 192], [156, 192],
+  // 七条: 1 top center + 3-3 below (1-3-3 pattern)
+  7: { scale: 0.44, positions: [
+    pos(0.50, 0.08),
+    pos(0.18, 0.40), pos(0.50, 0.40), pos(0.82, 0.40),
+    pos(0.18, 0.78), pos(0.50, 0.78), pos(0.82, 0.78),
   ]},
-  // 八条: 2×4 grid (2 columns, 4 rows)
-  8: { scale: 0.50, positions: [
-    [84, 38], [156, 38],
-    [84, 92], [156, 92],
-    [84, 148], [156, 148],
-    [84, 202], [156, 202],
+  // 八条: M-shape zigzag (wide-narrow-wide-narrow)
+  8: { scale: 0.44, positions: [
+    pos(0.22, 0.08), pos(0.78, 0.08),
+    pos(0.38, 0.35), pos(0.62, 0.35),
+    pos(0.22, 0.62), pos(0.78, 0.62),
+    pos(0.38, 0.89), pos(0.62, 0.89),
   ]},
-  // 九条 (crowd/很多人): 3×3 grid
-  9: { scale: 0.50, positions: [
-    [56, 44], [120, 44], [184, 44],
-    [56, 118], [120, 118], [184, 118],
-    [56, 192], [120, 192], [184, 192],
+  // 九条 (crowd): 3 columns × 3 rows
+  9: { scale: 0.42, positions: [
+    pos(0.18, 0.14), pos(0.50, 0.14), pos(0.82, 0.14),
+    pos(0.18, 0.50), pos(0.50, 0.50), pos(0.82, 0.50),
+    pos(0.18, 0.86), pos(0.50, 0.86), pos(0.82, 0.86),
   ]},
 };
 
@@ -71,7 +89,7 @@ function drawFigure(emotion) {
   g.appendChild(svgEl('circle', { cx: 3, cy: -27, r: 1.3, fill: '#333' }));
 
   const mouthAttrs = { fill: 'none', 'stroke-width': 1.5, 'stroke-linecap': 'round' };
-  if (emotion === 'celebrate') {
+  if (emotion === 'happy') {
     g.appendChild(svgEl('path', { ...mouthAttrs, d: 'M -4,-21.5 Q 0,-17 4,-21.5', stroke: '#333' }));
   } else if (emotion === 'thumbsup') {
     g.appendChild(svgEl('path', { ...mouthAttrs, d: 'M -3.5,-21.5 Q 0,-18.5 3.5,-21.5', stroke: '#333' }));
@@ -85,9 +103,9 @@ function drawFigure(emotion) {
   }));
 
   const arms = svgEl('g', { class: 'arms' });
-  if (emotion === 'celebrate') {
-    arms.appendChild(svgEl('line', { x1: 0, y1: -12, x2: -14, y2: -28, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
-    arms.appendChild(svgEl('line', { x1: 0, y1: -12, x2: 14, y2: -28, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
+  if (emotion === 'happy') {
+    arms.appendChild(svgEl('line', { x1: 0, y1: -10, x2: -15, y2: -4, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
+    arms.appendChild(svgEl('line', { x1: 0, y1: -10, x2: 15, y2: -4, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
   } else if (emotion === 'thumbsup') {
     arms.appendChild(svgEl('line', { x1: 0, y1: -10, x2: -11, y2: 0, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
     arms.appendChild(svgEl('line', { x1: 0, y1: -12, x2: 13, y2: -24, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
@@ -115,16 +133,8 @@ function createParticles(emotion, figIndex) {
   const g = svgEl('g', { class: `particles particles-${emotion}` });
   const d = figIndex * 0.12;
 
-  if (emotion === 'celebrate') {
-    const colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#FF922B'];
-    for (let i = 0; i < 5; i++) {
-      const cx = (i - 2) * 7;
-      g.appendChild(svgEl('rect', {
-        x: cx - 2, y: -42 - i * 3, width: 4, height: 4,
-        fill: colors[i], rx: 1, class: 'confetti',
-        style: `animation-delay: ${(d + i * 0.15).toFixed(2)}s`,
-      }));
-    }
+  if (emotion === 'happy') {
+    // No particles
   } else if (emotion === 'thumbsup') {
     for (let i = 0; i < 3; i++) {
       const angle = -70 + i * 35;
@@ -157,22 +167,25 @@ function createParticles(emotion, figIndex) {
 function drawTileBackground() {
   const g = svgEl('g', { class: 'tile-bg' });
 
-  // Tile shadow
+  // Tile shadow (portrait rectangle)
   g.appendChild(svgEl('rect', {
-    x: 6, y: 6, width: SIZE - 8, height: SIZE - 8,
-    fill: '#C8BFA0', rx: 18,
+    x: TILE_X + 3, y: TILE_Y + 4,
+    width: TILE_W, height: TILE_H,
+    fill: '#C8BFA0', rx: 14,
   }));
 
-  // Tile body — ivory mahjong tile
+  // Tile body — ivory mahjong tile (portrait)
   g.appendChild(svgEl('rect', {
-    x: 4, y: 2, width: SIZE - 8, height: SIZE - 8,
-    fill: '#F5EDD6', rx: 18, stroke: '#D4C9A8', 'stroke-width': 2,
+    x: TILE_X, y: TILE_Y,
+    width: TILE_W, height: TILE_H,
+    fill: '#F5EDD6', rx: 14, stroke: '#D4C9A8', 'stroke-width': 2,
   }));
 
   // Inner bevel highlight
   g.appendChild(svgEl('rect', {
-    x: 10, y: 8, width: SIZE - 20, height: SIZE - 20,
-    fill: 'none', rx: 14, stroke: '#FAF6EC', 'stroke-width': 1.5,
+    x: TILE_X + 5, y: TILE_Y + 5,
+    width: TILE_W - 10, height: TILE_H - 10,
+    fill: 'none', rx: 10, stroke: '#FAF6EC', 'stroke-width': 1.5,
   }));
 
   return g;
@@ -180,7 +193,7 @@ function drawTileBackground() {
 
 /**
  * Create a sticker SVG arranged like a mahjong bamboo tile (条子).
- * @param {'celebrate'|'thumbsup'|'love'} emotion
+ * @param {'happy'|'thumbsup'|'love'} emotion
  * @param {number} count - 3 through 8, or 9+ for crowd (九条)
  * @returns {SVGSVGElement}
  */

@@ -5,38 +5,27 @@ export function injectAnimations() {
   style.id = 'sticker-animations';
   style.textContent = `
 
-    /* ===================== CELEBRATE / 庆祝撒花 ===================== */
+    /* ===================== HAPPY / 开心 ===================== */
 
-    .sticker-celebrate .figure-anim {
-      animation: celebrateBounce 1.2s ease-in-out infinite both;
+    .sticker-happy .figure-anim {
+      animation: happyWiggle 0.8s ease-in-out infinite both;
     }
-    @keyframes celebrateBounce {
-      0%, 100% { transform: translateY(0); }
-      20%      { transform: translateY(-14px); }
-      40%      { transform: translateY(-2px); }
-      55%      { transform: translateY(-8px); }
-      70%      { transform: translateY(0); }
-    }
-
-    .sticker-celebrate .arms {
-      animation: celebrateWave 1.2s ease-in-out infinite both;
-      transform-origin: 0px -12px;
-    }
-    @keyframes celebrateWave {
+    @keyframes happyWiggle {
       0%, 100% { transform: rotate(0deg); }
-      20%      { transform: rotate(-12deg); }
-      40%      { transform: rotate(8deg); }
-      60%      { transform: rotate(-6deg); }
-      80%      { transform: rotate(4deg); }
+      20%      { transform: rotate(6deg); }
+      40%      { transform: rotate(-5deg); }
+      60%      { transform: rotate(4deg); }
+      80%      { transform: rotate(-3deg); }
     }
 
-    .confetti {
-      animation: confettiFall 1.2s linear infinite both;
+    .sticker-happy .arms {
+      animation: happySwing 0.8s ease-in-out infinite both;
+      transform-origin: 0px -10px;
     }
-    @keyframes confettiFall {
-      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
-      80%  { opacity: 0.6; }
-      100% { transform: translateY(40px) rotate(400deg); opacity: 0; }
+    @keyframes happySwing {
+      0%, 100% { transform: rotate(0deg); }
+      25%      { transform: rotate(10deg); }
+      75%      { transform: rotate(-10deg); }
     }
 
     /* ===================== THUMBS UP / 点赞加油 ===================== */

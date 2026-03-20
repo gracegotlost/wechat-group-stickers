@@ -2,7 +2,7 @@ const GIF_SIZE = 240;
 const FPS = 15;
 
 const EMOTION_DURATION = {
-  celebrate: 1200,
+  happy: 800,
   thumbsup: 800,
   love: 1400,
 };
@@ -90,7 +90,7 @@ async function renderSvgToImageData(svgElement) {
 /**
  * Export a single sticker SVG element to an animated GIF blob.
  * @param {SVGSVGElement} svgElement
- * @param {string} emotion - 'celebrate' | 'thumbsup' | 'love'
+ * @param {string} emotion - 'happy' | 'thumbsup' | 'love'
  * @param {function} [onProgress] - callback(framesDone, totalFrames)
  * @returns {Promise<Blob>}
  */
