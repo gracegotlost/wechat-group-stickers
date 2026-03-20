@@ -7,82 +7,69 @@ function svgEl(tag, attrs = {}) {
   return el;
 }
 
-/**
- * Compute layout positions for N figures within 240x240.
- * Returns array of { x, y, scale }.
- */
-function getLayout(count) {
-  if (count <= 4) {
-    const spacing = SIZE / (count + 1);
-    const sc = count === 3 ? 1.0 : 0.88;
-    return Array.from({ length: count }, (_, i) => ({
-      x: spacing * (i + 1),
-      y: SIZE * 0.52,
-      scale: sc,
-    }));
-  }
-  if (count === 5) {
-    const spacing = SIZE / 6;
-    return Array.from({ length: 5 }, (_, i) => ({
-      x: spacing * (i + 1),
-      y: SIZE * 0.52,
-      scale: 0.78,
-    }));
-  }
-  if (count <= 8) {
-    const topCount = Math.floor(count / 2);
-    const botCount = count - topCount;
-    const positions = [];
-    const sc = count <= 6 ? 0.72 : 0.62;
-    const topSpacing = SIZE / (topCount + 1);
-    const botSpacing = SIZE / (botCount + 1);
-    for (let i = 0; i < topCount; i++) {
-      positions.push({ x: topSpacing * (i + 1), y: SIZE * 0.35, scale: sc });
-    }
-    for (let i = 0; i < botCount; i++) {
-      positions.push({ x: botSpacing * (i + 1), y: SIZE * 0.68, scale: sc });
-    }
-    return positions;
-  }
+// Mahjong 条子 (bamboo tile) layouts
+// Each pattern mirrors the classic bamboo stick arrangements on mahjong tiles
+const MAHJONG_LAYOUTS = {
+  // 三条: vertical column of 3
+  3: { scale: 0.85, positions: [
+    [120, 58], [120, 118], [120, 178],
+  ]},
+  // 四条: 2×2 grid
+  4: { scale: 0.78, positions: [
+    [82, 78], [158, 78],
+    [82, 162], [158, 162],
+  ]},
+  // 五条: 2-1-2 cross pattern
+  5: { scale: 0.68, positions: [
+    [82, 52], [158, 52],
+    [120, 118],
+    [82, 184], [158, 184],
+  ]},
+  // 六条: 2×3 grid (2 columns, 3 rows)
+  6: { scale: 0.62, positions: [
+    [84, 48], [156, 48],
+    [84, 118], [156, 118],
+    [84, 188], [156, 188],
+  ]},
+  // 七条: 2-3-2 pattern
+  7: { scale: 0.56, positions: [
+    [84, 44], [156, 44],
+    [56, 118], [120, 118], [184, 118],
+    [84, 192], [156, 192],
+  ]},
+  // 八条: 2×4 grid (2 columns, 4 rows)
+  8: { scale: 0.50, positions: [
+    [84, 38], [156, 38],
+    [84, 92], [156, 92],
+    [84, 148], [156, 148],
+    [84, 202], [156, 202],
+  ]},
+  // 九条 (crowd/很多人): 3×3 grid
+  9: { scale: 0.50, positions: [
+    [56, 44], [120, 44], [184, 44],
+    [56, 118], [120, 118], [184, 118],
+    [56, 192], [120, 192], [184, 192],
+  ]},
+};
 
-  // Crowd mode (8+): pack ~15 figures in 3 rows
-  const rows = [4, 5, 6];
-  const yOffsets = [SIZE * 0.20, SIZE * 0.48, SIZE * 0.76];
-  const positions = [];
-  const sc = 0.46;
-  const seed = 42;
-  let s = seed;
-  function seededRandom() {
-    s = (s * 16807 + 0) % 2147483647;
-    return (s - 1) / 2147483646;
-  }
-  for (let r = 0; r < rows.length; r++) {
-    const n = rows[r];
-    const spacing = SIZE / (n + 1);
-    for (let i = 0; i < n; i++) {
-      positions.push({
-        x: spacing * (i + 1) + (seededRandom() - 0.5) * 6,
-        y: yOffsets[r] + (seededRandom() - 0.5) * 6,
-        scale: sc + (seededRandom() - 0.5) * 0.03,
-      });
-    }
-  }
-  return positions;
+function getLayout(count) {
+  const key = count > 8 ? 9 : count;
+  const layout = MAHJONG_LAYOUTS[key];
+  return layout.positions.map(([x, y]) => ({
+    x, y, scale: layout.scale,
+  }));
 }
 
 function drawFigure(emotion) {
   const g = svgEl('g', { class: `figure figure-${emotion}` });
 
-  // Head
   g.appendChild(svgEl('circle', {
-    cx: 0, cy: -25, r: 8, fill: '#fff', stroke: '#333', 'stroke-width': 2.5,
+    cx: 0, cy: -25, r: 8, fill: '#FAF6EC', stroke: '#333', 'stroke-width': 2.5,
   }));
 
-  // Eyes
   g.appendChild(svgEl('circle', { cx: -3, cy: -27, r: 1.3, fill: '#333' }));
   g.appendChild(svgEl('circle', { cx: 3, cy: -27, r: 1.3, fill: '#333' }));
 
-  // Mouth (emotion-specific)
   const mouthAttrs = { fill: 'none', 'stroke-width': 1.5, 'stroke-linecap': 'round' };
   if (emotion === 'celebrate') {
     g.appendChild(svgEl('path', { ...mouthAttrs, d: 'M -4,-21.5 Q 0,-17 4,-21.5', stroke: '#333' }));
@@ -92,13 +79,11 @@ function drawFigure(emotion) {
     g.appendChild(svgEl('path', { ...mouthAttrs, d: 'M -3.5,-21.5 Q 0,-17 3.5,-21.5', stroke: '#e55' }));
   }
 
-  // Body
   g.appendChild(svgEl('line', {
     x1: 0, y1: -17, x2: 0, y2: 5,
     stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round',
   }));
 
-  // Arms (wrapped in a group for animation)
   const arms = svgEl('g', { class: 'arms' });
   if (emotion === 'celebrate') {
     arms.appendChild(svgEl('line', { x1: 0, y1: -12, x2: -14, y2: -28, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
@@ -120,7 +105,6 @@ function drawFigure(emotion) {
   }
   g.appendChild(arms);
 
-  // Legs
   g.appendChild(svgEl('line', { x1: 0, y1: 5, x2: -8, y2: 20, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
   g.appendChild(svgEl('line', { x1: 0, y1: 5, x2: 8, y2: 20, stroke: '#333', 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
 
@@ -170,10 +154,34 @@ function createParticles(emotion, figIndex) {
   return g;
 }
 
+function drawTileBackground() {
+  const g = svgEl('g', { class: 'tile-bg' });
+
+  // Tile shadow
+  g.appendChild(svgEl('rect', {
+    x: 6, y: 6, width: SIZE - 8, height: SIZE - 8,
+    fill: '#C8BFA0', rx: 18,
+  }));
+
+  // Tile body — ivory mahjong tile
+  g.appendChild(svgEl('rect', {
+    x: 4, y: 2, width: SIZE - 8, height: SIZE - 8,
+    fill: '#F5EDD6', rx: 18, stroke: '#D4C9A8', 'stroke-width': 2,
+  }));
+
+  // Inner bevel highlight
+  g.appendChild(svgEl('rect', {
+    x: 10, y: 8, width: SIZE - 20, height: SIZE - 20,
+    fill: 'none', rx: 14, stroke: '#FAF6EC', 'stroke-width': 1.5,
+  }));
+
+  return g;
+}
+
 /**
- * Create a sticker SVG for the given emotion and people count.
+ * Create a sticker SVG arranged like a mahjong bamboo tile (条子).
  * @param {'celebrate'|'thumbsup'|'love'} emotion
- * @param {number} count - 3 through 8, or 9+ for crowd mode
+ * @param {number} count - 3 through 8, or 9+ for crowd (九条)
  * @returns {SVGSVGElement}
  */
 export function createSticker(emotion, count) {
@@ -183,18 +191,15 @@ export function createSticker(emotion, count) {
     class: `sticker sticker-${emotion}`,
   });
 
-  svg.appendChild(svgEl('rect', { width: SIZE, height: SIZE, fill: '#fff', rx: 16 }));
+  svg.appendChild(drawTileBackground());
 
-  const isCrowd = count > 8;
-  const layout = getLayout(isCrowd ? 9 : count);
+  const layout = getLayout(count > 8 ? 9 : count);
 
   layout.forEach((pos, i) => {
-    // Outer group: positioning only (SVG transform attribute)
     const posGroup = svgEl('g', {
       transform: `translate(${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}) scale(${pos.scale.toFixed(3)})`,
     });
 
-    // Inner group: CSS animation target
     const animGroup = svgEl('g', {
       class: 'figure-anim',
       style: `animation-delay: ${(i * 0.1).toFixed(2)}s`,
@@ -209,7 +214,12 @@ export function createSticker(emotion, count) {
   return svg;
 }
 
+const TIAO_NAMES = {
+  3: '三条', 4: '四条', 5: '五条',
+  6: '六条', 7: '七条', 8: '八条',
+};
+
 export function getCountLabel(count) {
-  if (count > 8) return '很多人';
-  return `${count}人`;
+  if (count > 8) return '九条 · 很多人';
+  return `${TIAO_NAMES[count]} · ${count}人`;
 }

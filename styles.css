@@ -6,7 +6,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: #f5f5f7;
+  background: #2D6A4F;
   color: #1d1d1f;
   padding: 40px 20px;
 }
@@ -16,11 +16,12 @@ h1 {
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 6px;
+  color: #FAF6EC;
 }
 
 .subtitle {
   text-align: center;
-  color: #86868b;
+  color: #B7E4C7;
   font-size: 15px;
   margin-bottom: 40px;
 }
@@ -41,6 +42,7 @@ h1 {
 .emotion-header h2 {
   font-size: 20px;
   font-weight: 600;
+  color: #FAF6EC;
 }
 
 .emotion-header .badge {
@@ -48,11 +50,12 @@ h1 {
   padding: 3px 10px;
   border-radius: 12px;
   font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-.badge-celebrate { background: #FFF3E0; color: #E65100; }
-.badge-thumbsup { background: #E3F2FD; color: #1565C0; }
-.badge-love { background: #FCE4EC; color: #C62828; }
+.badge-celebrate { background: rgba(255,243,224,0.15); color: #FFD93D; }
+.badge-thumbsup { background: rgba(227,242,253,0.15); color: #90CAF9; }
+.badge-love { background: rgba(252,228,236,0.15); color: #F48FB1; }
 
 .sticker-grid {
   display: grid;
@@ -61,18 +64,18 @@ h1 {
 }
 
 .sticker-card {
-  background: #fff;
+  background: #1B4332;
   border-radius: 16px;
   padding: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .sticker-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
   transform: translateY(-2px);
 }
 
@@ -91,8 +94,8 @@ h1 {
 }
 
 .sticker-label {
-  font-size: 13px;
-  color: #86868b;
+  font-size: 12px;
+  color: #B7E4C7;
   font-weight: 500;
 }
 
@@ -100,17 +103,18 @@ h1 {
   font-size: 11px;
   padding: 3px 10px;
   border-radius: 6px;
-  border: 1px solid #d2d2d7;
-  background: #fff;
-  color: #86868b;
+  border: 1px solid #52B788;
+  background: transparent;
+  color: #B7E4C7;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.15s;
 }
 
 .btn-dl:hover {
-  border-color: #0071e3;
-  color: #0071e3;
+  border-color: #95D5B2;
+  color: #D8F3DC;
+  background: rgba(82, 183, 136, 0.15);
 }
 
 .btn-dl:disabled {
@@ -129,7 +133,7 @@ h1 {
 
 .progress-text {
   font-size: 13px;
-  color: #86868b;
+  color: #B7E4C7;
 }
 
 .export-bar button {
