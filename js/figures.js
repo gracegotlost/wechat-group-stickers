@@ -129,6 +129,143 @@ function drawFigure(emotion) {
   return g;
 }
 
+function drawBirdOnTile() {
+  const g = svgEl('g');
+
+  const TX = 22, TY = 18, TW = 125, TH = 200, TR = 10;
+  const sc = '#5D4B3C';
+
+  // Tile shadow
+  g.appendChild(svgEl('rect', {
+    x: TX + 3, y: TY + 4, width: TW, height: TH, rx: TR, fill: '#C8BFA0',
+  }));
+  // Tile face
+  g.appendChild(svgEl('rect', {
+    x: TX, y: TY, width: TW, height: TH, rx: TR,
+    fill: '#F5EDD6', stroke: '#D4C9A8', 'stroke-width': 1.5,
+  }));
+  // Green top strip
+  const defs = svgEl('defs');
+  const clip = svgEl('clipPath', { id: 'tile-clip' });
+  clip.appendChild(svgEl('rect', { x: TX, y: TY, width: TW, height: TH, rx: TR }));
+  defs.appendChild(clip);
+  g.appendChild(defs);
+  g.appendChild(svgEl('rect', {
+    x: TX, y: TY, width: TW, height: 16,
+    fill: '#2D6A4F', 'clip-path': 'url(#tile-clip)',
+  }));
+  // Inner border
+  g.appendChild(svgEl('rect', {
+    x: TX + 5, y: TY + 20, width: TW - 10, height: TH - 26, rx: 6,
+    fill: 'none', stroke: '#EDE6D0', 'stroke-width': 1,
+  }));
+
+  // Bird
+  const bx = TX + TW / 2;
+  const by = 105;
+  const bRad = 28;
+
+  // Body (round)
+  g.appendChild(svgEl('circle', {
+    cx: bx, cy: by, r: bRad,
+    fill: '#F5EDD6', stroke: sc, 'stroke-width': 2,
+  }));
+  // Wing arc
+  g.appendChild(svgEl('path', {
+    d: `M ${bx - 2},${by - 12} Q ${bx - 24},${by + 4} ${bx - 5},${by + 23}`,
+    fill: 'none', stroke: sc, 'stroke-width': 1.5, 'stroke-linecap': 'round',
+  }));
+  // Tail
+  g.appendChild(svgEl('path', {
+    d: `M ${bx - 16},${by + 22} Q ${bx - 28},${by + 32} ${bx - 22},${by + 38}`,
+    fill: 'none', stroke: sc, 'stroke-width': 2, 'stroke-linecap': 'round',
+  }));
+  // Eyes
+  g.appendChild(svgEl('circle', { cx: bx - 7, cy: by - 5, r: 2.5, fill: sc }));
+  g.appendChild(svgEl('circle', { cx: bx + 7, cy: by - 5, r: 2.5, fill: sc }));
+  // Beak
+  g.appendChild(svgEl('path', {
+    d: `M ${bx},${by + 2} L ${bx + 6},${by + 5} L ${bx},${by + 8}`,
+    fill: 'none', stroke: sc, 'stroke-width': 1.5,
+    'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+  }));
+
+  // Branch
+  const brY = by + bRad + 8;
+  g.appendChild(svgEl('path', {
+    d: `M ${TX + 12},${brY + 2} C ${bx - 15},${brY - 2} ${bx + 15},${brY + 2} ${TX + TW - 12},${brY - 1}`,
+    fill: 'none', stroke: sc, 'stroke-width': 2, 'stroke-linecap': 'round',
+  }));
+  // Feet
+  g.appendChild(svgEl('path', {
+    d: `M ${bx - 5},${by + bRad - 1} L ${bx - 6},${brY} M ${bx - 9},${brY + 1} L ${bx - 3},${brY - 1}`,
+    fill: 'none', stroke: sc, 'stroke-width': 1.5, 'stroke-linecap': 'round',
+  }));
+  g.appendChild(svgEl('path', {
+    d: `M ${bx + 5},${by + bRad - 1} L ${bx + 4},${brY} M ${bx + 1},${brY + 1} L ${bx + 7},${brY - 1}`,
+    fill: 'none', stroke: sc, 'stroke-width': 1.5, 'stroke-linecap': 'round',
+  }));
+
+  // Leaves on branch
+  function leaf(ox, oy, angle, len) {
+    const rad = angle * Math.PI / 180;
+    const ex = ox + Math.cos(rad) * len;
+    const ey = oy + Math.sin(rad) * len;
+    const cpx = ox + Math.cos(rad + 0.4) * len * 0.6;
+    const cpy = oy + Math.sin(rad + 0.4) * len * 0.6;
+    g.appendChild(svgEl('path', {
+      d: `M ${ox.toFixed(1)},${oy.toFixed(1)} Q ${cpx.toFixed(1)},${cpy.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}`,
+      fill: 'none', stroke: sc, 'stroke-width': 1.2, 'stroke-linecap': 'round',
+    }));
+  }
+  leaf(TX + 22, brY + 1, -65, 10);
+  leaf(TX + 22, brY + 1, -145, 8);
+  leaf(TX + 36, brY, -55, 9);
+  leaf(TX + 36, brY, -135, 7);
+  leaf(TX + TW - 22, brY, -115, 10);
+  leaf(TX + TW - 22, brY, -35, 8);
+  leaf(TX + TW - 36, brY + 1, -125, 9);
+  leaf(TX + TW - 36, brY + 1, -45, 7);
+
+  // Vertical text "言为定"
+  const textX = 190;
+  const fontSize = 42;
+  const lineH = 55;
+  const chars = ['言', '为', '定'];
+  const startY = 80;
+
+  for (let i = 0; i < chars.length; i++) {
+    const t = svgEl('text', {
+      x: textX,
+      y: startY + i * lineH,
+      'font-family': "'STXingkai', 'STKaiti', 'KaiTi', 'Kai', serif",
+      'font-size': fontSize,
+      'font-weight': '900',
+      fill: '#2C2C2C',
+      'text-anchor': 'middle',
+    });
+    t.textContent = chars[i];
+    g.appendChild(t);
+  }
+
+  return g;
+}
+
+export function createCharacterTest() {
+  const svg = svgEl('svg', {
+    viewBox: `0 0 ${SIZE} ${SIZE}`,
+    xmlns: SVG_NS,
+    class: 'sticker',
+  });
+
+  svg.appendChild(svgEl('rect', {
+    x: 0, y: 0, width: SIZE, height: SIZE, fill: '#FFFFFF', rx: 8,
+  }));
+  svg.appendChild(drawBirdOnTile());
+
+  return svg;
+}
+
 function createParticles(emotion, figIndex) {
   const g = svgEl('g', { class: `particles particles-${emotion}` });
   const d = figIndex * 0.12;
